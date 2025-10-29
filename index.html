@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento | INNOVACARE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Cores e Estilos Principais */
+        :root {
+            --ana-pink: #DDA0DD;      /* Rosa Lavanda */
+            --ana-dark: #800080;      /* Roxo Escuro/Púrpura (Cor da Marca) */
+            --background-body-image: #F9E7EA; /* Rosa Suave (Fundo do Body) */
+            --background-card: #FFFFFF; /* Branco Puro (Fundo do Wrapper e Chat) */
+            --font-main: 'Montserrat', sans-serif; /* Fonte Principal */
+            --font-elegant: 'Dancing Script', cursive; /* Fonte Elegante */
+            --header-bg: var(--ana-dark); 
+            --header-color: #FFFFFF;
+            --subtle-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --floating-element-color: rgba(221, 160, 221, 0.6); 
+            --floating-element-dark-color: rgba(128, 0, 128, 0.5); 
+            --button-secondary: #A9A9A9; /* Cor secundária para 'Voltar' ou 'Ajuda' */
+            --whatsapp-green: #25D366; /* Cor oficial do WhatsApp */
+        }
+
+        /* --- ESTILOS DO PRELOADER (CUSTOMIZADO FEMF) --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--ana-dark); 
+            z-index: 9999; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out; 
+            flex-direction: column; 
+        }
+        
+        .spinner-container {
+            position: relative;
+            width: 250px;   
+            height: 250px;  
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px; 
+        }
+
+        .spinner {
+            border: 20px solid rgba(255, 255, 255, 0.3); 
+            border-top: 20px solid var(--ana-pink);      
+            border-radius: 50%;
+            width: 200px;   
+            height: 200px;  
+            animation: spin 1s linear infinite;
+        }
+
+        .preloader-text {
+            position: absolute; 
+            font-family: var(--font-elegant);
+            font-size: 5.5em; 
+            font-weight: 700;
+            color: var(--header-color); 
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            line-height: 1; 
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- ESTILOS GLOBAIS E TEMA DE FUNDO --- */
+        body { 
+            font-family: var(--font-main); 
+            background: linear-gradient(135deg, var(--background-body-image) 0%, #F5DDE0 100%);
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box;
+            color: #333;
+            overflow-y: auto; 
+
+            background-image: url('https://images.unsplash.com/photo-1627471201533-3d0d3b0c5b3c?fit=crop&w=1920&q=80'); 
+            background-size: cover; 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed; 
+            position: relative; 
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(249, 231, 234, 0.8) 0%, rgba(245, 221, 224, 0.8) 100%); 
+            backdrop-filter: blur(2px); 
+            z-index: -1; 
+        }
+
+        .page-content-wrapper {
+            opacity: 0; 
+            transition: opacity 0.5s ease-in;
+            display: none; 
+            position: relative; 
+            width: 100%;
+            max-width: 600px; 
+            margin: 15px auto; 
+            flex-direction: column; 
+            justify-content: flex-start;
+            align-items: center; 
+            z-index: 1; 
+        }
+        
+        .page-content-wrapper.loaded {
+            opacity: 1;
+            display: flex; 
+        }
+
+        /* --- ELEMENTOS FLUTUANTES (Desktop) --- */
+        .floating-element {
+            position: absolute;
+            background-color: var(--floating-element-color);
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: float 15s ease-in-out infinite alternate;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 0;
+        }
+
+        .floating-element:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 15%; animation-delay: 0s; background-color: var(--floating-element-dark-color);}
+        .floating-element:nth-child(2) { width: 120px; height: 120px; top: 70%; left: 80%; animation-delay: 5s; }
+        .floating-element:nth-child(3) { width: 60px; height: 60px; top: 40%; left: 5%; animation-delay: 2s; background-color: var(--floating-element-dark-color);}
+        .floating-element:nth-child(4) { width: 100px; height: 100px; top: 20%; left: 70%; animation-delay: 8s; }
+        .floating-element:nth-child(5) { width: 70px; height: 70px; top: 90%; left: 30%; animation-delay: 3s; background-color: var(--floating-element-dark-color);}
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-20px) rotate(5deg) scale(1.02); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+        
+        /* Título Principal */
+        .demo-info {
+            max-width: 600px; 
+            width: 95%;
+            margin: 0 auto 10px auto; 
+            text-align: center; 
+            position: relative; 
+            z-index: 10; 
+        }
+        
+        .demo-info h1 {
+            color: var(--ana-dark);
+            font-family: var(--font-elegant); 
+            font-size: 3.5em; 
+            font-weight: 700;
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+            border-bottom: none; 
+        }
+        
+        /* Estrutura da Janela (Card Branco) */
+        .demo-wrapper {
+            background-color: var(--background-card);
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px; 
+            width: 95%;
+            box-sizing: border-box;
+            position: relative; 
+            z-index: 10; 
+            text-align: center;
+        }
+        
+        /* Container Principal do Chat (Ajustes de Altura) */
+        .chat-container { 
+            background-color: var(--background-card);
+            width: 100%; 
+            max-width: 550px; 
+            border-radius: 15px; 
+            box-shadow: var(--subtle-shadow); 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            height: 60vh; 
+            max-height: 500px; 
+            margin: 0 auto; 
+        }
+
+        /* Estilos do Chat Header */
+        .chat-header { 
+            background-color: var(--header-bg); 
+            color: var(--header-color); 
+            padding: 15px 20px; 
+            text-align: left; 
+            font-size: 1.2em; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header-content { margin-left: 12px; }
+        .header-content h3 { margin: 0; font-size: 1em; }
+        .header-content span { 
+            font-size: 0.7em; 
+            font-weight: 400; 
+            opacity: 0.9; 
+            display: block;
+            color: #FFE0F0;
+        }
+
+        /* Logo de Texto no Header */
+        .profile-pic { 
+            width: auto; 
+            height: auto; 
+            font-size: 1.5em; 
+            color: #FFFFFF; 
+            padding: 0 5px; 
+        }
+        .profile-pic .logo-text {
+            font-weight: 700;
+            font-size: 1em; 
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+        
+        .chat-body { 
+            padding: 15px; 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            background-color: #F8F8F8; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        /* Balões de Mensagem */
+        .message { 
+            background-color: #E6E6FA; /* Cor do balão da IA */
+            color: #333;
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 15px 15px 15px 5px; 
+            max-width: 85%; 
+            align-self: flex-start; 
+            line-height: 1.4;
+            box-shadow: var(--subtle-shadow); 
+            text-align: left;
+        }
+        
+        .user-message {
+            background-color: var(--ana-dark); /* Balão do usuário na cor da marca */
+            color: white;
+            padding: 12px;
+            margin: 8px 0; 
+            border-radius: 15px 15px 5px 15px; 
+            max-width: 85%; 
+            align-self: flex-end; 
+            font-size: 0.95em;
+            box-shadow: var(--subtle-shadow); 
+            text-align: left; 
+        }
+        
+        /* Balão de Sucesso do WhatsApp (MANTIDO CASO SEJA USADO) */
+        .success-whatsapp {
+            background-color: var(--whatsapp-green); 
+            color: white;
+            padding: 15px; 
+            border-radius: 15px 15px 15px 5px; 
+            max-width: 85%; 
+            align-self: flex-start; 
+            line-height: 1.4;
+            box-shadow: 0 4px 8px rgba(37, 211, 102, 0.4); 
+            text-align: left;
+            font-weight: 600;
+        }
+        .success-whatsapp .whatsapp-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        /* Novo estilo para o Botão Flutuante de Ação (CONFIRMAÇÃO FINAL) */
+        .action-button-float { 
+            width: 100%;
+            align-self: flex-start; 
+            max-width: 85%;
+            margin: 15px 0 10px 0;
+        }
+        .action-button-float .option-button {
+            margin-left: auto; 
+            max-width: 100%; 
+            display: block; 
+        }
+
+        /* --- Estilo Específico para o Botão Final (Roxo Elegante) --- */
+        .final-whatsapp-button {
+            background-color: var(--ana-dark) !important; 
+            color: white !important;
+            font-size: 1.1em !important; 
+            padding: 15px !important; 
+            margin-top: 5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(128, 0, 128, 0.4);
+        }
+        .final-whatsapp-button:hover {
+            background-color: #4B0082 !important; 
+        }
+        
+        .welcome-ana {
+            font-weight: 700;
+            color: var(--ana-dark);
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        /* Style para a mensagem de Endereço/FAQ */
+        .address-box, .hours-box {
+            padding: 15px;
+            background-color: #f0f0f8;
+            border-radius: 10px;
+            text-align: left;
+            margin-bottom: 15px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+        .address-box a {
+            color: var(--ana-dark);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .hours-box strong { color: var(--ana-dark); }
+        .hours-box ul { list-style: none; padding-left: 0; margin: 10px 0 0 0; }
+        .hours-box ul li { padding: 5px 0; border-bottom: 1px solid #eee; }
+        .hours-box ul li:last-child { border-bottom: none; }
+
+
+        /* Rodapé das Mensagens */
+        .message-footer {
+            display: flex; justify-content: flex-end; align-items: center;
+            font-size: 0.65em; 
+            color: #555; margin-top: 5px;
+            line-height: 1;
+        }
+        .user-message .message-footer {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .success-whatsapp .message-footer {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Botões de Opções */
+        .options-menu { 
+            margin-top: 15px; display: flex; flex-direction: column; width: 100%; 
+            padding: 10px; 
+            border-radius: 10px;
+            border: 1px solid #eee;
+            background-color: var(--background-card);
+        }
+        .option-button { 
+            /* MUDANÇA SOLICITADA: Botão Principal Roxo */
+            background-color: var(--ana-dark); 
+            color: white; border: none; padding: 12px; margin-bottom: 10px; 
+            border-radius: 8px; text-align: center; font-weight: 600; cursor: pointer; 
+            transition: background-color 0.3s, transform 0.1s; 
+            font-size: 0.95em;
+        }
+        .option-button:last-child {
+            margin-bottom: 0;
+        }
+        .option-button:hover { 
+            background-color: #4B0082; 
+            transform: translateY(-1px);
+        }
+        .option-button.secondary {
+            background-color: var(--button-secondary);
+            font-weight: 400;
+            font-size: 0.9em;
+            padding: 8px 12px;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+        .option-button.secondary:hover {
+            background-color: #888;
+        }
+        
+        /* Estilo Específico para Botões de Utilitário (MAPS, etc.) */
+        .option-button.utility-link {
+            background-color: #007bff !important; /* Azul Profissional */
+            color: white !important;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.4);
+            font-weight: 700;
+        }
+        .option-button.utility-link:hover {
+            background-color: #0056b3 !important;
+        }
+
+        /* Botões de Data/Hora (Grid) */
+        .time-button, .day-button {
+            background-color: #fff;
+            color: var(--ana-dark);
+            border: 1px solid var(--ana-dark); /* Borda Roxo para destaque */
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            box-sizing: border-box;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .time-button.selected, .day-button.selected {
+             background-color: var(--ana-dark);
+             color: white;
+             border: 1px solid var(--ana-dark);
+        }
+        .day-button { flex-basis: calc(50% - 10px); margin-bottom: 10px; }
+        .time-button { flex-basis: calc(33.333% - 10px); }
+        .time-selection-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 5px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        
+        /* Formulário de Pré-Cadastro */
+        .pre-cadastro-form {
+            padding: 15px;
+            background-color: #f0f0f8; 
+            border-radius: 10px;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .pre-cadastro-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .form-submit-button {
+            width: 100%;
+            background-color: var(--ana-dark);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-submit-button:hover {
+            background-color: #4B0082;
+        }
+        
+        /* --- INDICADOR DE DIGITAÇÃO --- */
+        .typing-indicator {
+            background-color: #E6E6FA; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 15px 15px 15px 5px; 
+            max-width: 85px; 
+            align-self: flex-start; 
+            line-height: 1.4;
+            box-shadow: var(--subtle-shadow); 
+            text-align: center;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 1px;
+            background-color: var(--ana-dark);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: bounce 0.9s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            50% { transform: translateY(0); } 
+        }
+        
+        /* --- RESPONSIVIDADE (MODO TELA CHEIA PARA MOBILE) --- */
+        @media (max-width: 600px) {
+            /* Título e Container */
+            .demo-info h1 { 
+                font-size: 1.8em; 
+                line-height: 1.3; 
+                margin-bottom: 5px; 
+            }
+            .demo-wrapper { 
+                padding: 10px; 
+                max-width: 100%; 
+                width: 100%; 
+                box-shadow: none; 
+                border-radius: 0; 
+            }
+            body { 
+                padding: 0; 
+                align-items: stretch; 
+            }
+            .page-content-wrapper { 
+                padding: 0; 
+                margin: 0;
+                height: 100vh; 
+                justify-content: flex-start; 
+            } 
+            
+            /* Container Principal do Chat */
+            .chat-container { 
+                width: 100%; 
+                max-width: 100%; 
+                height: 100%; 
+                max-height: 100%; 
+                border-radius: 0; 
+                box-shadow: none; 
+            }
+            
+            /* Ajustes Finos */
+            .time-button, .day-button { 
+                flex-basis: calc(50% - 10px); 
+            }
+            .floating-element { 
+                display: none; 
+            } 
+            
+            .chat-body {
+                padding: 10px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="preloader">
+    <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="preloader-text">FEMF</div> 
+    </div>
+</div>
+
+<div class="page-content-wrapper" id="page-content-wrapper">
+    
+    <div class="floating-element"><i class="fas fa-leaf"></i></div> 
+    <div class="floating-element"><i class="fas fa-spa"></i></div>
+    <div class="floating-element"><i class="fas fa-magic"></i></div>
+    <div class="floating-element"><i class="fas fa-gem"></i></div>
+    <div class="floating-element"><i class="fas fa-star-of-life"></i></div> 
+
+    <div class="demo-info">
+        <h1>Clínica de Estética INNOVACARE | Agendamento Inteligente</h1>
+    </div>
+
+    <div class="demo-wrapper">
+        <div class="chat-container">
+            <div class="chat-header">
+                
+                <div class="profile-pic"> 
+                    <span class="logo-text">IA</span>
+                </div>
+                <div class="header-content">
+                    <h3>Assistente de Agendamento</h3>
+                    <span>Innovacare | Qualificação Ativa por IA</span>
+                </div>
+            </div>
+            <div class="chat-body" id="chat-body">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Variáveis de Estado da IA ---
+    let chatState = 0; 
+    let agendamento = {
+        nome: '',
+        qualificacao: '',
+        tratamento: '',
+        area: '',
+        data: '',
+        hora: '',
+        // Telefone e e-mail removidos da coleta
+    };
+    
+    // --- Dados Fixos da Clínica ---
+    const CLINIC_NAME = 'Innovacare';
+    // Número do WhatsApp da Clínica em Itajubá, MG
+    const WA_NUMBER = '5535998069202'; 
+    const CLINIC_ADDRESS = 'Av. Pres. Tancredo de Almeida Neves, 45 - Avenida, Itajubá - MG, 37504-066';
+    
+    // CORREÇÃO: Link de Google Maps válido
+    const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CLINIC_ADDRESS)}`;
+    
+    // Horários de Funcionamento (Simplificado)
+    const WORKING_HOURS_LIST = `
+        <ul>
+            <li>**Segunda a Sexta:** 09:00h às 18:00h</li>
+            <li>**Sábados:** 09:00h às 12:00h</li>
+            <li>**Domingos e Feriados:** Fechado</li>
+        </ul>
+    `;
+
+
+    // Lista de Protocolos e Áreas
+    const PROTOCOLOS = {
+        'Rejuvenescimento e Cuidados Faciais': [
+            "Rejuvenescimento Facial com Laser",
+            "Peeling Químico Personalizado",
+            "Limpeza de Pele Profunda",
+            "Microagulhamento com Ativos",
+        ],
+        'Redução e Contorno Corporal': [
+            "Radiofrequência para Flacidez", 
+            "Criolipólise (Redução de Gordura Localizada)", 
+            "Harmonização Corporal (Lipomodelagem)",
+        ],
+        'Depilação': [
+            "Depilação a Laser" 
+        ],
+        'Massagem e Pós-Cirurgia': [
+            "Drenagem Linfática Pós-Operatório",
+            "Massagem Relaxante Terapêutica",
+        ]
+    };
+    
+    // Mapeamento das Áreas de Tratamento
+    const AREAS = {
+        "Rejuvenescimento Facial com Laser": ["Face Completa", "Pescoço e Colo", "Olhos e Testa"],
+        "Peeling Químico Personalizado": ["Face e Pescoço", "Mãos"],
+        "Limpeza de Pele Profunda": ["Face (Com Peeling de Diamante)", "Face (Sem Peeling)"], 
+        "Microagulhamento com Ativos": ["Face (Cicatrizes de Acne)", "Pescoço e Colo (Rugas)"], 
+        "Radiofrequência para Flacidez": ["Abdômen", "Braços (Tchauzinho)", "Glúteos e Coxas"], 
+        "Criolipólise (Redução de Gordura Localizada)": ["Abdômen Superior", "Flancos", "Pneuzinhos das Costas"], 
+        "Harmonização Corporal (Lipomodelagem)": ["Abdômen", "Glúteos e Coxas", "Flancos"],
+        "Drenagem Linfática Pós-Operatório": ["Geral (Corpo)", "Membros Inferiores"], 
+        "Massagem Relaxante Terapêutica": ["Geral (Corpo Inteiro)", "Dorsal e Cervical"], 
+        "Depilação a Laser": ["Axilas e Virilha", "Meia Perna", "Face e Pescoço"] 
+    };
+
+    const DIAS_DISPONIVEIS = getAvailableDays(7); 
+
+    // --- Funções de Utilitários ---
+    
+    function formatTextToHtml(text) {
+        if (!text) return '';
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        return formattedText;
+    }
+
+    function getAvailableDays(numDays) {
+        const days = [];
+        let date = new Date();
+        const options = { weekday: 'short', day: '2-digit', month: 'short' };
+        
+        date.setDate(date.getDate()); 
+        
+        while (days.length < numDays) {
+            date.setDate(date.getDate() + 1); 
+            const dayOfWeek = date.getDay(); 
+
+            // Exclui Domingo (0)
+            if (dayOfWeek !== 0) { 
+                const display = date.toLocaleDateString('pt-BR', options).replace('.', '');
+                const value = date.toISOString().split('T')[0]; 
+                days.push({ display, value });
+            }
+        }
+        return days;
+    }
+
+    function getAvailableTimes() {
+        const times = [];
+        // Horários disponíveis para agendamento (entre 10h e 17h, excluindo 13h)
+        for (let h = 10; h <= 17; h++) {
+            if (h !== 13) { 
+                times.push(`${h.toString().padStart(2, '0')}:00`);
+            }
+        }
+        return times;
+    }
+
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+
+    // --- Funções de Manipulação da UI do Chat ---
+
+    const chatBody = document.getElementById('chat-body');
+
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.id = 'typing-indicator';
+        indicator.innerHTML = '<span></span><span></span><span></span>';
+        chatBody.appendChild(indicator);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    function addMessage(text, isUser = false, isSuccess = false) {
+        removeTypingIndicator(); 
+        const messageDiv = document.createElement('div');
+        
+        if (isSuccess) {
+            messageDiv.className = 'success-whatsapp';
+        } else {
+            messageDiv.className = isUser ? 'user-message' : 'message';
+        }
+        
+        const content = document.createElement('div');
+        content.innerHTML = formatTextToHtml(text); 
+        messageDiv.appendChild(content);
+
+        const footer = document.createElement('div');
+        footer.className = 'message-footer';
+        footer.innerHTML = `<span class="message-time">${getCurrentTime()}</span>`;
+        messageDiv.appendChild(footer);
+
+        chatBody.appendChild(messageDiv);
+        
+        // Rolagem para o final da última mensagem enviada (boa UX para respostas do usuário)
+        chatBody.scrollTop = chatBody.scrollHeight; 
+    }
+
+    // FUNÇÃO CRÍTICA COM O AJUSTE DE ROLAGEM DE UX SOLICITADO
+    function addMessageWithOptions(text, htmlOptions, isSuccess = false) {
+        showTypingIndicator();
+        setTimeout(() => {
+            // 1. Remove o indicador de digitação
+            removeTypingIndicator(); 
+            
+            // 2. Adiciona a mensagem principal (balão da IA)
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            const content = document.createElement('div');
+            content.innerHTML = formatTextToHtml(text);
+            messageDiv.appendChild(content);
+
+            const footer = document.createElement('div');
+            footer.className = 'message-footer';
+            footer.innerHTML = `<span class="message-time">${getCurrentTime()}</span>`;
+            messageDiv.appendChild(footer);
+
+            chatBody.appendChild(messageDiv);
+            
+            // 3. Adiciona os botões/opções
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'message';
+            optionsDiv.innerHTML = htmlOptions;
+            chatBody.appendChild(optionsDiv);
+            
+            // 4. Rola a tela para garantir que o TOPO da nova mensagem da IA esteja visível
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 1500); 
+    }
+    
+    // Função para o botão de atendente (SOLICITAÇÃO: DEIXADA VAZIA)
+    function generateWhatsappButton(customMessage = '') {
+        return ''; // Retorna string vazia, não renderiza o botão
+    }
+
+    // --- Funções de Navegação e Conteúdo (Fluxo da IA) ---
+
+    function resetChat() {
+        chatBody.innerHTML = '';
+        agendamento = { nome: '', qualificacao: '', tratamento: '', area: '', data: '', hora: '' }; 
+        chatState = 0;
+        
+        showTypingIndicator();
+        setTimeout(() => {
+            askForName(); // INICIA PERGUNTANDO O NOME
+        }, 2000); 
+    }
+    
+    // --- ESTADO 0: COLETAR NOME ---
+    function askForName() {
+        chatState = 0; 
+        const inputForm = `
+            <div class="pre-cadastro-form">
+                <input type="text" id="nomeInput" placeholder="Digite seu Nome Completo" required>
+                <button class="form-submit-button" onclick="submitName()">Enviar</button>
+            </div>
+        `;
+
+        addMessageWithOptions(`
+            <div class="welcome-ana">👋 Olá! Seja muito bem-vinda à **${CLINIC_NAME}**!</div>
+            Eu sou a **Assistente Virtual**, especializada em protocolos estéticos.
+            Antes de iniciarmos, qual é o seu **nome completo**, por favor?
+        `, inputForm);
+
+        setTimeout(() => {
+            const input = document.getElementById('nomeInput');
+            if(input) input.focus();
+        }, 1600);
+    }
+
+    function submitName() {
+        const input = document.getElementById('nomeInput');
+        const name = input ? input.value.trim() : '';
+
+        if (name.length < 3) {
+            alert("Por favor, digite seu nome completo.");
+            return;
+        }
+        
+        agendamento.nome = name;
+        addMessage(name, true); 
+        showMainMenu(); 
+    }
+
+    // --- ESTADO 1: MENU PRINCIPAL ---
+    function showMainMenu() {
+        chatState = 1; 
+        const userName = agendamento.nome.split(' ')[0]; 
+        const options = `
+            <div class="options-menu">
+                <button class="option-button" onclick="selectOption('iniciar')">⭐ Iniciar Agendamento</button>
+                <button class="option-button" onclick="selectOption('faq')">❓ Perguntas Frequentes (FAQ)</button>
+                <button class="option-button" onclick="selectOption('endereco')">📍 Ver Endereço da Clínica</button>
+                <button class="option-button" onclick="selectOption('horarios')">⏰ Horário de Funcionamento</button>
+                <button class="option-button" onclick="selectOption('sobre')">💎 Sobre Nós</button>
+            </div>
+        `;
+        addMessageWithOptions(`
+            Obrigada, **${userName}**! Que bom ter você aqui. O que gostaria de fazer hoje?
+        `, options);
+    }
+    
+    // --- FUNÇÕES ADICIONAIS DO MENU ---
+    function showWorkingHours() {
+        chatState = 1;
+        const options = `
+            <div class="options-menu">
+                <button class="option-button" onclick="selectOption('iniciar')">⭐ Iniciar Agendamento Agora!</button>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+        
+        const hoursMessage = `
+            <div class="hours-box">
+                <div class="welcome-ana">⏰ **Nossos Horários para Agendamento:**</div>
+                ${WORKING_HOURS_LIST}
+            </div>
+        `;
+
+        addMessageWithOptions(hoursMessage, options);
+    }
+
+    function showAboutUs() {
+        chatState = 1; 
+        const options = `
+            <div class="options-menu">
+                <button class="option-button" onclick="selectOption('iniciar')">⭐ Iniciar Agendamento Agora!</button>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+        
+        const aboutMessage = `
+            <div class="welcome-ana">✨ **INNOVACARE: Estética Baseada em Ciência e Resultados.**</div>
+            <p>Não vendemos apenas tratamentos, vendemos a **certeza da sua transformação**.</p>
+            
+            <ul>
+                <li>**Tecnologia de Ponta:** Protocolos validados e equipamentos de última geração.</li>
+                <li>**Personalização Única:** Cada jornada é desenhada após uma *Análise Inteligente* do seu perfil.</li>
+                <li>**Compromisso:** Seu resultado é nossa prioridade máxima.</li>
+            </ul>
+            
+            <p>Venha viver a experiência INNOVACARE, onde a inovação se encontra com o cuidado.</p>
+        `;
+
+        addMessageWithOptions(aboutMessage, options);
+    }
+
+    function showAddress() {
+        chatState = 1; 
+        const options = `
+            <div class="address-box">
+                <strong>Clínica **${CLINIC_NAME}** - Itajubá:</strong>
+                ${CLINIC_ADDRESS}
+                <br><br>
+                <a href="${MAPS_LINK}" target="_blank" class="option-button utility-link" style="display: block; margin: 0;">
+                    <i class="fas fa-map-marker-alt"></i> Abrir no Google Maps
+                </a>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+        addMessageWithOptions("Claro! Aqui está a localização da nossa clínica em Itajubá:", options);
+    }
+    
+    function showIAInfo() {
+        chatState = 1; 
+        const options = `
+            <div class="options-menu">
+                <button class="option-button" onclick="selectOption('iniciar')">⭐ Iniciar Agendamento</button>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+        
+        const infoMessage = `
+            <div class="welcome-ana">💡 **O que é a Qualificação IA?**</div>
+            Este é um processo rápido para garantir que seu tempo seja otimizado.
+            \n
+            1. Você nos informa a **área de interesse**.
+            2. Nós filtramos os **protocolos ideais**.
+            3. Você escolhe o **melhor horário**.
+            \n
+            Com esses dados em mãos, a clínica já terá uma prévia do seu desejo e poderá te atender com maior *agilidade* e *personalização* via WhatsApp!
+        `;
+
+        addMessageWithOptions(infoMessage, options);
+    }
+    
+    // --- FUNÇÃO ADICIONAL: FAQ (Perguntas Frequentes) ---
+    function showFAQ() {
+        chatState = 1; 
+
+        const faqContent = `
+            <div class="hours-box">
+                <div class="welcome-ana">❓ **Perguntas Frequentes:**</div>
+                <ul>
+                    <li>**O que acontece após o envio?** Seu horário fica reservado temporariamente. Nossa equipe entrará em contato via WhatsApp para confirmar a reserva em até **10 minutos**.</li>
+                    <li>**Posso reagendar ou cancelar?** O cancelamento/reagendamento deve ser feito com no mínimo **24 horas** de antecedência, diretamente pelo WhatsApp de confirmação. Assim, garantimos a vaga para outra cliente.</li>
+                    <li>**Qual a forma de pagamento e preços?** Os preços variam por protocolo e número de sessões. O pagamento é feito na clínica (Cartão, PIX ou Dinheiro) no dia do atendimento. Os valores finais serão detalhados na sua confirmação via WhatsApp.</li>
+                    <li>**Preciso de preparo prévio?** Depende do protocolo. Por exemplo, para tratamentos a laser ou faciais, é recomendado evitar exposição solar intensa dias antes. Nossa equipe irá te orientar sobre o preparo específico na mensagem de confirmação.</li>
+                    <li>**Preciso levar algo?** Apenas um documento de identificação.</li>
+                </ul>
+                <p>Se sua dúvida não foi respondida, por favor, inicie seu agendamento ou volte ao menu.</p>
+            </div>
+        `;
+
+        const options = `
+            <div class="options-menu">
+                <button class="option-button" onclick="selectOption('iniciar')">⭐ Iniciar Agendamento Agora!</button>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+
+        addMessageWithOptions(faqContent, options);
+    }
+    
+    // --- ESTADO 2: QUALIFICAÇÃO ---
+    function startQualificacao() {
+        chatState = 2; 
+        const options = `
+            <div class="options-menu">
+                ${Object.keys(PROTOCOLOS).map(qual => 
+                    `<button class="option-button" onclick="processUserMessage('${qual}')">${qual}</button>`
+                ).join('')}
+                <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+            </div>
+        `;
+        addMessageWithOptions(
+            "Excelente! Para que eu possa te guiar ao protocolo ideal, me diga: Qual é a sua **área de principal interesse** para começar a sua transformação?",
+            options
+        );
+    }
+    
+    // --- ESTADO 3: SELEÇÃO DE TRATAMENTO/PROTOCOLO ---
+    function askForTratamento() {
+        chatState = 3;
+        const tratamentos = PROTOCOLOS[agendamento.qualificacao] || [];
+        
+        if (tratamentos.length === 0) {
+            addMessageWithOptions("Ops! Não encontrei protocolos para esta área. Por favor, volte e tente outra opção.", `<button class="option-button secondary" onclick="selectOption('voltar-qualificacao')">↩️ Voltar para Áreas</button>`);
+            return;
+        }
+
+        const options = `
+            <div class="options-menu">
+                ${tratamentos.map(tratamento => 
+                    `<button class="option-button" onclick="processUserMessage('${tratamento}')">${tratamento}</button>`
+                ).join('')}
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-qualificacao')">↩️ Voltar para Áreas</button>
+        `;
+
+        addMessageWithOptions(`
+            Ótimo. Na área de **${agendamento.qualificacao}**, qual protocolo específico você está buscando?
+        `, options);
+    }
+
+    // --- ESTADO 4: SELEÇÃO DE ÁREA ESPECÍFICA ---
+    function askForArea() {
+        chatState = 4;
+        const areas = AREAS[agendamento.tratamento] || [];
+        
+        if (areas.length === 0) {
+            agendamento.area = 'Geral/Não se aplica';
+            addMessage(`Protocolo **${agendamento.tratamento}** selecionado. Não é necessário definir a área neste caso.`, false);
+            askForDate();
+            return;
+        }
+
+        const options = `
+            <div class="options-menu">
+                ${areas.map(area => 
+                    `<button class="option-button" onclick="processUserMessage('${area}')">${area}</button>`
+                ).join('')}
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-tratamento')">↩️ Voltar para Protocolos</button>
+        `;
+
+        addMessageWithOptions(`
+            Perfeito! O protocolo **${agendamento.tratamento}** pode ser aplicado em diferentes focos. Qual área do corpo você deseja focar neste agendamento?
+        `, options);
+    }
+
+    // --- ESTADO 5: SELEÇÃO DE DATA ---
+    function askForDate() {
+        chatState = 5;
+        const today = new Date().toLocaleDateString('pt-BR');
+        
+        const options = `
+            <div class="time-selection-grid">
+                ${DIAS_DISPONIVEIS.map(day => 
+                    `<button class="day-button" data-value="${day.value}" onclick="processUserMessage('${day.value}', '**${day.display}**')">${day.display}</button>`
+                ).join('')}
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-area')">↩️ Voltar para Área Focada</button>
+        `;
+
+        addMessageWithOptions(`
+            Excelente! Agora, vamos escolher a data. Por favor, selecione um dia nos próximos dias para a sua sessão de **${agendamento.tratamento}**.
+        `, options);
+    }
+    
+    // --- ESTADO 6: SELEÇÃO DE HORA ---
+    function askForTime() {
+        chatState = 6;
+        const times = getAvailableTimes();
+        
+        const options = `
+            <div class="time-selection-grid">
+                ${times.map(time => 
+                    `<button class="time-button" onclick="processUserMessage('${time}')">${time}</button>`
+                ).join('')}
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-data')">↩️ Voltar para Data</button>
+        `;
+
+        const dateObj = new Date(agendamento.data);
+        const dayDisplay = dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+
+        addMessageWithOptions(`
+            Dia **${dayDisplay}** confirmado. Por favor, escolha agora o **horário** em que você prefere ser atendida:
+        `, options);
+    }
+    
+    // --- ESTADO 7: CONFIRMAÇÃO DO RESUMO (Sem coleta de contato) ---
+    function confirmAgendamento() {
+        chatState = 7;
+        
+        // MENSAGEM DO RESUMO ATUALIZADA (com apenas 'Seu Agendamento' em negrito)
+        const resumo = `
+            <div class="pre-cadastro-form">
+                <div class="welcome-ana">✨ <strong>Seu Agendamento:</strong></div>
+                <p>
+                    Protocolo: ${agendamento.tratamento} <br>
+                    Área Focada: ${agendamento.area} <br>
+                    Data e Hora: ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}h <br>
+                </p>
+            </div>
+        `;
+
+        const options = `
+            <div class="options-menu" style="margin-top: 5px;">
+                <button class="option-button" onclick="processUserMessage('finalizar')">✅ Sim, Finalizar Reserva!</button>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('voltar-menu')">↩️ Voltar ao Menu Principal</button>
+        `;
+
+        addMessageWithOptions(
+            `Quase lá, **${agendamento.nome.split(' ')[0]}**! Por favor, confira o resumo da sua reserva e clique em **Finalizar** para ser redirecionada ao nosso WhatsApp:`,
+            resumo + options
+        );
+    }
+
+    // --- ESTADO 8: CONCLUSÃO E WHATSAPP ---
+    function finalizarAgendamento() {
+        chatState = 8;
+        
+        // MENSAGEM FINAL AJUSTADA (com emojis e em formato de lista simples)
+        const waText = `
+👋 Olá, meu nome é ${agendamento.nome}, e fiz um PRÉ-AGENDAMENTO pela Assistente Virtual da Innovacare.
+
+📝 DETALHES DA RESERVA:
+
+✨ Protocolo: ${agendamento.tratamento}
+🎯 Área Focada: ${agendamento.area || 'Geral/Não se aplica'}
+📅 Data: ${agendamento.data.split('-').reverse().join('/')}
+⏰ Horário: ${agendamento.hora}h
+
+✅ Por favor, confirmem minha reserva! Este é o meu contato principal (o do WhatsApp).
+        `.trim(); 
+
+        const finalMessage = `
+            <i class="fas fa-check-circle whatsapp-icon" style="color: var(--ana-dark);"></i> **Pré-Agendamento Registrado!**
+            \n
+            Seu horário para **${agendamento.tratamento}** no dia **${agendamento.data.split('-').reverse().join('/')}** às **${agendamento.hora}h** está reservado temporariamente.
+            \n
+            *O próximo passo é obrigatório:* Clique no botão abaixo para **enviar os detalhes** para nossa equipe e garantir a **confirmação final** via WhatsApp.
+        `;
+        
+        const waLink = `https://api.whatsapp.com/send?phone=${WA_NUMBER}&text=${encodeURIComponent(waText)}`;
+        
+        const options = `
+            <div class="action-button-float">
+                <a href="${waLink}" target="_blank" class="option-button final-whatsapp-button">
+                    <i class="fab fa-whatsapp"></i> ENVIAR AGENDAMENTO
+                </a>
+            </div>
+            <button class="option-button secondary" onclick="selectOption('reset')" style="margin-top: 10px; max-width: 85%;">🔄 Iniciar um Novo Agendamento</button>
+        `;
+
+        addMessageWithOptions(finalMessage, options, false); 
+    }
+
+    // --- PROCESSAMENTO PRINCIPAL (ROUTER) ---
+    function processUserMessage(message, display = null) {
+        
+        const lastMessage = chatBody.lastChild;
+        if (lastMessage && lastMessage.className.includes('message')) {
+            const buttonsContainer = lastMessage.querySelector('.options-menu') || lastMessage.querySelector('.time-selection-grid');
+            if (buttonsContainer) {
+                buttonsContainer.parentElement.removeChild(buttonsContainer); 
+            }
+             // Adiciona a resposta do usuário no chat
+            addMessage(display || message, true);
+        }
+
+        // Mapeamento de Opções/Estados
+        switch (chatState) {
+            case 1: // Menu Principal
+                agendamento.qualificacao = '';
+                if (message === 'iniciar') startQualificacao();
+                else if (message === 'faq') showFAQ(); 
+                else if (message === 'endereco') showAddress();
+                else if (message === 'horarios') showWorkingHours();
+                else if (message === 'sobre') showAboutUs();
+                else if (message === 'info') showIAInfo();
+                else if (message === 'voltar-menu') showMainMenu();
+                break;
+
+            case 2: // Qualificação
+                agendamento.qualificacao = message;
+                askForTratamento();
+                break;
+
+            case 3: // Seleção de Tratamento
+                if (message === 'voltar-qualificacao') { startQualificacao(); break; }
+                agendamento.tratamento = message;
+                askForArea();
+                break;
+                
+            case 4: // Seleção de Área
+                if (message === 'voltar-tratamento') { askForTratamento(); break; }
+                agendamento.area = message;
+                askForDate();
+                break;
+                
+            case 5: // Seleção de Data
+                if (message === 'voltar-area') { askForArea(); break; }
+                agendamento.data = message; 
+                askForTime();
+                break;
+
+            case 6: // Seleção de Hora
+                if (message === 'voltar-data') { askForDate(); break; }
+                agendamento.hora = message;
+                confirmAgendamento(); // Vai direto para o resumo de confirmação
+                break;
+                
+            case 7: // Confirmação de Agendamento (Novo fluxo sem coleta de contato)
+                if (message === 'finalizar') {
+                    finalizarAgendamento(); 
+                    break;
+                }
+                if (message === 'voltar-menu') { 
+                    agendamento.qualificacao = agendamento.tratamento = agendamento.area = agendamento.data = agendamento.hora = '';
+                    showMainMenu(); 
+                    break; 
+                 }
+                break;
+            case 8: // Conclusão
+                if (message === 'reset') resetChat();
+                break;
+        }
+    }
+    
+    function selectOption(option) {
+        if (option === 'voltar-menu') {
+            agendamento.qualificacao = agendamento.tratamento = agendamento.area = agendamento.data = agendamento.hora = '';
+            showMainMenu();
+            return;
+        }
+        
+        if (['iniciar', 'endereco', 'horarios', 'sobre', 'info', 'faq', 'reset'].includes(option) || option.startsWith('voltar-')) {
+            processUserMessage(option);
+            return;
+        }
+    }
+
+
+    // --- INICIALIZAÇÃO E PRELOADER ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.getElementById('preloader');
+        const contentWrapper = document.getElementById('page-content-wrapper');
+
+        setTimeout(() => {
+            preloader.style.opacity = '0';
+            
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                contentWrapper.style.display = 'flex';
+                contentWrapper.classList.add('loaded');
+                resetChat(); 
+            }, 500); 
+            
+        }, 1000); 
+    });
+</script>
+</body>
+</html>
